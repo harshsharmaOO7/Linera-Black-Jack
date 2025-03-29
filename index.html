@@ -1,0 +1,84 @@
+Linera Blackjack Game
+Try your luck against the dealer!
+
+<button onclick="startGame()">Start Game</button>
+<button onclick="hit()">Hit</button>
+<button onclick="stand()">Stand</button>
+
+<div class="card-container">
+<h2>Player's Hand: <span id="player-hand"></span></h2>
+<h2>Dealer's Hand: <span id="dealer-hand"></span></h2>
+</div>
+<h2 id="result"></h2>
+
+<script>
+let playerHand = [];
+let dealerHand = [];
+let deck = [];
+
+function createDeck() {
+let suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+let values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+deck = [];
+for (let suit of suits) {
+for (let value of values) {
+deck.push({ suit, value });
+}
+}
+deck.sort(() => Math.random() - 0.5); // Shuffle deck
+}
+
+function dealHands() {
+playerHand = [deck.pop(), deck.pop()];
+dealerHand = [deck.pop(), deck.pop()];
+updateDisplay();
+}
+
+function updateDisplay() {
+document.getElementById("player-hand").innerText = playerHand.map(card => `${card.value} of ${card.suit}`).join(', ');
+document.getElementById("dealer-hand").innerText = dealerHand.map(card => `${card.value} of ${card.suit}`).join(', ');
+}
+
+function hit() {
+playerHand.push(deck.pop());
+updateDisplay();
+}
+
+function stand() {
+document.getElementById("result").innerText = checkWinner();
+}
+
+function checkWinner() {
+let playerScore = calculateHandValue(playerHand);
+let dealerScore = calculateHandValue(dealerHand);
+if (playerScore > 21) return "Dealer wins!";
+if (dealerScore > 21) return "Player wins!";
+if (playerScore > dealerScore) return "Player wins!";
+if (playerScore < dealerScore) return "Dealer wins!";
+return "It's a tie!";
+}
+
+function calculateHandValue(hand) {
+let value = 0, aces = 0;
+for (let card of hand) {
+if (['J', 'Q', 'K'].includes(card.value)) {
+value += 10;
+} else if (card.value === 'A') {
+aces += 1;
+value += 11;
+} else {
+value += parseInt(card.value);
+}
+}
+while (value > 21 && aces > 0) {
+value -= 10;
+aces -= 1;
+}
+return value;
+}
+
+function startGame() {
+createDeck();
+dealHands();
+}
+</script>
